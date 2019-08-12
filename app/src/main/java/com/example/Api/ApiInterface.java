@@ -1,0 +1,31 @@
+package com.example.Api;
+
+import com.example.Models.NewsResponse;
+
+import retrofit2.Call;
+import retrofit2.http.GET;
+import retrofit2.http.Query;
+
+/*
+** Uses the URL Endpoint and other queries to complete the call.
+**/
+public interface ApiInterface {
+
+    //Endpoint for Top Headlines
+    @GET("top-headlines")
+    Call<NewsResponse> getTopHeadlines(@Query("country") String country,
+                                    @Query("apiKey") String apiKey);
+
+    //Endpoint for category Headlines
+    @GET("top-headlines")
+    Call<NewsResponse> getCategoryHeadlines(@Query("category") String category,
+                                       @Query("apiKey") String apiKey);
+
+    //Endpoint to fetch search results.
+    @GET("everything")
+    Call<NewsResponse> getSearchResults(@Query("q") String query,
+                                        @Query("sortBy") String sortBy,
+                                        @Query("language") String language,
+                                        @Query("apiKey") String apiKey);
+
+}
