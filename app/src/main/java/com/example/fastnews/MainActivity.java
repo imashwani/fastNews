@@ -1,70 +1,37 @@
 package com.example.fastnews;
 
 import android.content.DialogInterface;
-import android.content.Intent;
+import android.database.sqlite.SQLiteConstraintException;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 
 import com.example.Fragment.LocalNewsFragment;
+import com.example.Fragment.NewsFragment;
 import com.example.Fragment.NewsWebViewFragment;
-import com.example.Fragment.TrendingFragment;
+import com.example.Fragment.SavedArticlesFragment;
+import com.example.Models.Article;
+import com.example.RoomDb.AppExecutors;
+import com.example.RoomDb.ArticlesDatabase;
+
 
 public class MainActivity extends AppCompatActivity implements FragmentActionListener {
 
     FragmentManager fragmentManager;
     FragmentTransaction fragmentTransaction;
     Fragment active;
-    TrendingFragment trendingFragment;
+    NewsFragment newsFragment;
     LocalNewsFragment localNewsFragment;
     NewsWebViewFragment newsWebViewFragment;
-
-    private Toolbar toolbar;
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        BottomNavigationView navView = findViewById(R.id.nav_view);
-        navView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-
-        trendingFragment = new TrendingFragment();
-        trendingFragment.setFragmentActionListener(this);
-        localNewsFragment = new LocalNewsFragment();
-        active = trendingFragment;
-
-        fragmentManager = this.getSupportFragmentManager();
-        if (fragmentManager.findFragmentById(R.id.mainFragmentContainer) == null) {
-            fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.add(R.id.mainFragmentContainer, localNewsFragment).hide(localNewsFragment);
-            fragmentTransaction.add(R.id.mainFragmentContainer, trendingFragment);
-            fragmentTransaction.commit();
-        }
-    }
-
-    private void showTrending() {
-        fragmentTransaction = fragmentManager.beginTransaction();
-        trendingFragment = new TrendingFragment();
-        fragmentTransaction.replace(R.id.mainFragmentContainer, trendingFragment);
-        fragmentTransaction.addToBackStack(this.getClass().getName());
-        fragmentTransaction.commit();
-    }
-
-    private void showLocalNews() {
-        fragmentTransaction = fragmentManager.beginTransaction();
-        localNewsFragment = new LocalNewsFragment();
-        fragmentTransaction.replace(R.id.mainFragmentContainer, localNewsFragment);
-        fragmentTransaction.addToBackStack(this.getClass().getName());
-        fragmentTransaction.commit();
-    }
-
+    SavedArticlesFragment savedArticlesFragment;
+    private ArticlesDatabase articlesDatabase;
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -72,8 +39,8 @@ public class MainActivity extends AppCompatActivity implements FragmentActionLis
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.trending:
-                    fragmentManager.beginTransaction().hide(active).show(trendingFragment).commit();
-                    active = trendingFragment;
+                    fragmentManager.beginTransaction().hide(active).show(newsFragment).commit();
+                    active = newsFragment;
                     return true;
 
                 case R.id.navigation_local_news:
@@ -82,12 +49,41 @@ public class MainActivity extends AppCompatActivity implements FragmentActionLis
                     return true;
 
                 case R.id.navigation_notifications:
-
+                    fragmentManager.beginTransaction().hide(active).show(savedArticlesFragment).commit();
+                    active = savedArticlesFragment;
                     return true;
             }
             return false;
         }
     };
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        BottomNavigationView navView = findViewById(R.id.nav_view);
+        navView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+
+        newsFragment = new NewsFragment();
+        newsFragment.setFragmentActionListener(this);
+        localNewsFragment = new LocalNewsFragment();
+        localNewsFragment.setActivityContext(this);
+        savedArticlesFragment = new SavedArticlesFragment();
+        savedArticlesFragment.setFragmentActionListener(this);
+        active = newsFragment;
+
+        fragmentManager = this.getSupportFragmentManager();
+        if (fragmentManager.findFragmentById(R.id.mainFragmentContainer) == null) {
+            fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.add(R.id.mainFragmentContainer, localNewsFragment).hide(localNewsFragment);
+            fragmentTransaction.add(R.id.mainFragmentContainer, savedArticlesFragment).hide(savedArticlesFragment);
+            fragmentTransaction.add(R.id.mainFragmentContainer, newsFragment);
+            fragmentTransaction.commit();
+        }
+
+        articlesDatabase = ArticlesDatabase.getInstance(getApplicationContext());
+    }
 
     @Override
     public void onBackPressed() {
@@ -128,6 +124,23 @@ public class MainActivity extends AppCompatActivity implements FragmentActionLis
     @Override
     public void onActionPerformed(Bundle bundle) {
         showWebViewFragment(bundle);
+    }
+
+    @Override
+    public void saveNewsOffline(Article article) {
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                Log.d("sql", "run: inserting the data: " + article.getTitle());
+                try {
+                    article.setSaved(true);
+                    articlesDatabase.articlesDao().insertArticle(article);
+                } catch (SQLiteConstraintException sqlConstExct) {
+                    sqlConstExct.printStackTrace();
+                    Log.d("sql", "run: data already present" + article.getTitle());
+                }
+            }
+        });
     }
 
 

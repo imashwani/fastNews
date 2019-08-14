@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -22,10 +23,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.example.Models.Article;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.MyViewHolder> {
@@ -82,6 +80,16 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.MyViewHolder> 
         holder.desc.setText(article.getDescription());
         holder.source.setText(article.getSource().getName());
         holder.time.setText(Util.getFormattedDate(article.getPublishedAt()));
+        if (article.isSaved()) {
+            holder.saveImageBtn.setVisibility(View.GONE);
+        } else {
+            holder.saveImageBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onItemListener.saveNewsOffline(article);
+                }
+            });
+        }
     }
 
     public void setOnItemClickListener(OnItemListener onItemListener) {
@@ -93,11 +101,18 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.MyViewHolder> 
         return articles.size();
     }
 
+    public interface OnItemListener {
+        void onItemClickListener(View view, int position);
+
+        void saveNewsOffline(Article article);
+    }
+
     public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         OnItemListener onItemListener;
         TextView title, desc, author, published_ad, source, time;
         ImageView imageView;
         ProgressBar progressBar;
+        ImageButton saveImageBtn;
 
         public MyViewHolder(@NonNull View itemView, OnItemListener onItemListener) {
             super(itemView);
@@ -110,6 +125,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.MyViewHolder> 
             time = itemView.findViewById(R.id.time);
             imageView = itemView.findViewById(R.id.single_items_news_image);
             progressBar = itemView.findViewById(R.id.prograss_load_photo);
+            saveImageBtn = itemView.findViewById(R.id.save_img_btn_single_item);
 
             this.onItemListener = onItemListener;
         }
@@ -118,9 +134,5 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.MyViewHolder> 
         public void onClick(View v) {
             onItemListener.onItemClickListener(v, getAdapterPosition());
         }
-    }
-
-    public interface OnItemListener {
-        void onItemClickListener(View view, int position);
     }
 }

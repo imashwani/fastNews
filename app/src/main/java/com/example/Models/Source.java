@@ -1,7 +1,20 @@
 package com.example.Models;
 
-public class Source {
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
+
+import java.io.Serializable;
+
+@Entity(tableName = "source")
+public class Source implements Serializable {
+    @ColumnInfo(name = "id")
+    @PrimaryKey
+    @NonNull
     private String id;
+
+    @ColumnInfo(name = "name")
     private String name;
 
     public String getId() {

@@ -7,16 +7,12 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.example.Api.ApiClient;
 import com.example.Api.ApiInterface;
 import com.example.Models.Article;
@@ -32,12 +28,9 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static android.content.ContentValues.TAG;
+public class NewsFragment extends Fragment implements NewsAdapter.OnItemListener {
+    public static final String ARG_CATEGORY = "category";
 
-/**
- * A simple {@link Fragment} subclass.
- */
-public class TrendingFragment extends Fragment implements NewsAdapter.OnItemListener {
     FragmentActionListener fragmentActionListener;
     View rootView;
     ArrayList<Article> articleStructure = new ArrayList<>();
@@ -45,11 +38,20 @@ public class TrendingFragment extends Fragment implements NewsAdapter.OnItemList
     RecyclerView.LayoutManager layoutManager;
     NewsAdapter newsAdapter;
     ProgressBar progressBar;
+    String category = null;
 
-    public TrendingFragment() {
+    public NewsFragment() {
         // Required empty public constructor
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if (getArguments() != null) {
+            category = getArguments().getString(ARG_CATEGORY);
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -71,7 +73,8 @@ public class TrendingFragment extends Fragment implements NewsAdapter.OnItemList
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         if (savedInstanceState == null) {
-            loadJSON();
+            if (category != null) loadCategoryJSON();
+            else loadJSON();
         } else {
             articleStructure = (ArrayList<Article>) savedInstanceState.getSerializable("data");
             setData();
@@ -90,20 +93,18 @@ public class TrendingFragment extends Fragment implements NewsAdapter.OnItemList
         super.onSaveInstanceState(outState);
 
         outState.putSerializable("data", articleStructure);
-
     }
 
     private void loadJSON() {
         ApiInterface request = ApiClient.getClient().create(ApiInterface.class);
 
-        Call<NewsResponse> call = request.getTopHeadlines("in", Constants.API_KEY);
+        Call<NewsResponse> call = request.getTopCountryHeadlines("in", Constants.API_KEY);
         call.enqueue(new Callback<NewsResponse>() {
 
             @Override
             public void onResponse(@NonNull Call<NewsResponse> call, @NonNull Response<NewsResponse> response) {
 
                 if (response.isSuccessful() && response.body().getArticles() != null) {
-
                     if (!articleStructure.isEmpty()) {
                         articleStructure.clear();
                     }
@@ -119,9 +120,35 @@ public class TrendingFragment extends Fragment implements NewsAdapter.OnItemList
         });
     }
 
+    private void loadCategoryJSON() {
+        ApiInterface request = ApiClient.getClient().create(ApiInterface.class);
+        if (category != null) {
+            Call<NewsResponse> call = request.getCategoryHeadlines(category, "in", Constants.API_KEY);
+            call.enqueue(new Callback<NewsResponse>() {
+                @Override
+                public void onResponse(@NonNull Call<NewsResponse> call, @NonNull Response<NewsResponse> response) {
+
+                    if (response.isSuccessful() && response.body().getArticles() != null) {
+                        if (!articleStructure.isEmpty()) {
+                            articleStructure.clear();
+                        }
+                        articleStructure = response.body().getArticles();
+                        setData();
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<NewsResponse> call, @NonNull Throwable t) {
+                    Toast.makeText(getContext(), "ERROR IN GETTING RESPONSE, please retry !", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            Toast.makeText(getContext(), "ERROR IN Category args", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     @Override
     public void onItemClickListener(View view, int position) {
-//        Toast.makeText(getContext(), "clicked " + (position), Toast.LENGTH_SHORT).show();
         Bundle bundle = new Bundle();
         bundle.putSerializable(FragmentActionListener.KEY_SELECTED_NEWS, articleStructure.get(position));
         if (fragmentActionListener != null) {
@@ -129,7 +156,21 @@ public class TrendingFragment extends Fragment implements NewsAdapter.OnItemList
         }
     }
 
+    @Override
+    public void saveNewsOffline(Article article) {
+        if (fragmentActionListener != null) {
+            Toast.makeText(getActivity(), "saving news offline" + article.getTitle(), Toast.LENGTH_SHORT).show();
+            fragmentActionListener.saveNewsOffline(article);
+        }
+    }
+
     public void setFragmentActionListener(FragmentActionListener fal) {
         fragmentActionListener = fal;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        fragmentActionListener = null;
     }
 }
