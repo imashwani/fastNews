@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">Fast News</string>
     <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
     <string name="title_local_news">Local News</string>
     <string name="trending">Trending</string>
@@ -11,4 +10,7 @@
     <string name="title_activity_search">SearchActivity</string>
     <string name="menu_title_about">About</string>
     <string name="bookmark">Bookmarks</string>
+    <string name="saved">Saved</string>
+    <string name="search">Search</string>
+    <string name="no_result_found">No Result Found</string>
 </resources>

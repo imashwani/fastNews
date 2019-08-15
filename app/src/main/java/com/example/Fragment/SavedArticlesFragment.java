@@ -31,15 +31,15 @@ import java.util.List;
 public class SavedArticlesFragment extends Fragment implements NewsAdapter.OnItemListener {
 
 
-    View rootView;
-    LifecycleOwner context;
-    ArticlesDatabase articlesDatabase;
-    LiveData<List<Article>> articlesLiveData;
-    RecyclerView recyclerView;
-    RecyclerView.LayoutManager layoutManager;
-    NewsAdapter newsAdapter;
-    ArrayList<Article> articles;
-    FragmentActionListener fragmentActionListener = null;
+    private View rootView;
+    private LifecycleOwner context;
+    private ArticlesDatabase articlesDatabase;
+    private LiveData<List<Article>> articlesLiveData;
+    private RecyclerView recyclerView;
+    private RecyclerView.LayoutManager layoutManager;
+    private NewsAdapter newsAdapter;
+    private ArrayList<Article> articles;
+    private FragmentActionListener fragmentActionListener = null;
 
     public SavedArticlesFragment() {
         // Required empty public constructor
@@ -101,7 +101,6 @@ public class SavedArticlesFragment extends Fragment implements NewsAdapter.OnIte
 
             }
         });
-
     }
 
 
@@ -116,6 +115,11 @@ public class SavedArticlesFragment extends Fragment implements NewsAdapter.OnIte
 
     @Override
     public void saveNewsOffline(Article article) {
+    }
+
+    @Override
+    public void deleteNews(Article article) {
+        fragmentActionListener.deleteNewsFromDb(article);
     }
 
     public void setFragmentActionListener(FragmentActionListener fal) {

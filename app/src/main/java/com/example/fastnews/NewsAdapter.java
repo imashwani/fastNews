@@ -81,15 +81,20 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.MyViewHolder> 
         holder.source.setText(article.getSource().getName());
         holder.time.setText(Util.getFormattedDate(article.getPublishedAt()));
         if (article.isSaved()) {
-            holder.saveImageBtn.setVisibility(View.GONE);
-        } else {
-            holder.saveImageBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    onItemListener.saveNewsOffline(article);
-                }
-            });
+//            holder.saveImageBtn.setVisibility(View.GONE);
+            holder.saveImageBtn.setImageResource(R.drawable.ic_delete_forever_black_24dp);
         }
+
+        holder.saveImageBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (article.isSaved())
+                    onItemListener.deleteNews(article);
+                else
+                    onItemListener.saveNewsOffline(article);
+            }
+        });
+
     }
 
     public void setOnItemClickListener(OnItemListener onItemListener) {
@@ -105,6 +110,8 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.MyViewHolder> 
         void onItemClickListener(View view, int position);
 
         void saveNewsOffline(Article article);
+
+        void deleteNews(Article article);
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

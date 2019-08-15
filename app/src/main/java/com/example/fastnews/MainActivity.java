@@ -13,30 +13,45 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 
+import androidx.work.Constraints;
+import androidx.work.NetworkType;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
+
 import com.example.Fragment.LocalNewsFragment;
 import com.example.Fragment.NewsFragment;
 import com.example.Fragment.NewsWebViewFragment;
 import com.example.Fragment.SavedArticlesFragment;
+import com.example.Fragment.SearchFragment;
 import com.example.Models.Article;
 import com.example.RoomDb.AppExecutors;
 import com.example.RoomDb.ArticlesDatabase;
+import com.example.Worker.RepeatTopNewsNotifWork;
+
+import java.util.Calendar;
 
 
 public class MainActivity extends AppCompatActivity implements FragmentActionListener {
 
-    FragmentManager fragmentManager;
-    FragmentTransaction fragmentTransaction;
-    Fragment active;
-    NewsFragment newsFragment;
-    LocalNewsFragment localNewsFragment;
-    NewsWebViewFragment newsWebViewFragment;
-    SavedArticlesFragment savedArticlesFragment;
+    private FragmentManager fragmentManager;
+    private FragmentTransaction fragmentTransaction;
+    private Fragment active;
+    private NewsFragment newsFragment;
+    private LocalNewsFragment localNewsFragment;
+    private NewsWebViewFragment newsWebViewFragment;
+    private SavedArticlesFragment savedArticlesFragment;
+    private SearchFragment searchFragment = null;
+
     private ArticlesDatabase articlesDatabase;
+
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            if (fragmentManager.findFragmentById(R.id.mainFragmentContainer) instanceof NewsWebViewFragment) {
+                fragmentManager.popBackStack();
+            }
             switch (item.getItemId()) {
                 case R.id.trending:
                     fragmentManager.beginTransaction().hide(active).show(newsFragment).commit();
@@ -52,6 +67,19 @@ public class MainActivity extends AppCompatActivity implements FragmentActionLis
                     fragmentManager.beginTransaction().hide(active).show(savedArticlesFragment).commit();
                     active = savedArticlesFragment;
                     return true;
+                case R.id.navigation_search:
+                    if (searchFragment == null) {
+                        searchFragment = new SearchFragment();
+                        searchFragment.setFragmentActionListener(MainActivity.this);
+                        fragmentManager.beginTransaction().hide(active)
+                                .add(R.id.mainFragmentContainer, searchFragment)
+                                .show(searchFragment).commit();
+
+                    } else {
+                        fragmentManager.beginTransaction().hide(active).show(searchFragment).commit();
+                    }
+                    active = searchFragment;
+                    return true;
             }
             return false;
         }
@@ -64,13 +92,13 @@ public class MainActivity extends AppCompatActivity implements FragmentActionLis
         BottomNavigationView navView = findViewById(R.id.nav_view);
         navView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-
         newsFragment = new NewsFragment();
         newsFragment.setFragmentActionListener(this);
         localNewsFragment = new LocalNewsFragment();
         localNewsFragment.setActivityContext(this);
         savedArticlesFragment = new SavedArticlesFragment();
         savedArticlesFragment.setFragmentActionListener(this);
+//        searchFragment = new SearchFragment();
         active = newsFragment;
 
         fragmentManager = this.getSupportFragmentManager();
@@ -83,7 +111,9 @@ public class MainActivity extends AppCompatActivity implements FragmentActionLis
         }
 
         articlesDatabase = ArticlesDatabase.getInstance(getApplicationContext());
+        setupNotification();
     }
+
 
     @Override
     public void onBackPressed() {
@@ -143,5 +173,46 @@ public class MainActivity extends AppCompatActivity implements FragmentActionLis
         });
     }
 
+    @Override
+    public void deleteNewsFromDb(Article article) {
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                Log.d("sql", "run: deleting the data: " + article.getTitle());
+                try {
+                    articlesDatabase.articlesDao().deleteArticle(article);
+                } catch (SQLiteConstraintException sqlConstExct) {
+                    sqlConstExct.printStackTrace();
+                }
+            }
+        });
+    }
 
+    void setupNotification() {
+
+        Constraints constraints = new Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED).build();
+
+        Calendar currentDate = Calendar.getInstance();
+        Calendar dueDate = Calendar.getInstance();
+        dueDate.set(Calendar.HOUR, 8);
+        dueDate.set(Calendar.MINUTE, 0);
+        dueDate.set(Calendar.SECOND, 0);
+        if (dueDate.before(currentDate)) {
+            dueDate.add(Calendar.HOUR_OF_DAY, 24);
+        }
+        long timeDiff = dueDate.getTimeInMillis() - currentDate.getTimeInMillis();
+
+        OneTimeWorkRequest oneTimeWorkRequest
+                = new OneTimeWorkRequest
+                .Builder(RepeatTopNewsNotifWork.class)
+                .setConstraints(constraints)
+//                .setInitialDelay(timeDiff, TimeUnit.MILLISECONDS)
+                .build();
+
+        WorkManager.getInstance().enqueue(oneTimeWorkRequest);
+
+
+        Log.d("MainActivity", "setupNotification: Setting up Notification");
+    }
 }

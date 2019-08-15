@@ -14,4 +14,6 @@ public interface FragmentActionListener {
     void onActionPerformed(Bundle bundle);
 
     void saveNewsOffline(Article article);
+
+    void deleteNewsFromDb(Article article);
 }

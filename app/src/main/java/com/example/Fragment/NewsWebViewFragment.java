@@ -2,18 +2,13 @@ package com.example.Fragment;
 
 
 import android.os.Bundle;
-import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -24,15 +19,13 @@ import com.example.fastnews.FragmentActionListener;
 import com.example.fastnews.R;
 import com.example.fastnews.Util;
 
-import static android.support.constraint.Constraints.TAG;
-
 /**
  * A simple {@link Fragment} subclass.
  */
 public class NewsWebViewFragment extends Fragment {
 
-    View rootView;
-    Article article = null;
+    private View rootView;
+    private Article article = null;
 
     private ImageView newsImageIV;
     private TextView date, timeTV, titleTV;
@@ -56,7 +49,8 @@ public class NewsWebViewFragment extends Fragment {
 
         return rootView;
     }
-    private void initView(){
+
+    private void initView() {
         newsImageIV = rootView.findViewById(R.id.backdrop);
         timeTV = rootView.findViewById(R.id.tv_time_webview);
         titleTV = rootView.findViewById(R.id.tv_title_webview);
@@ -74,7 +68,7 @@ public class NewsWebViewFragment extends Fragment {
         titleTV.setText(article.getTitle());
     }
 
-    private void initWebView(String url){
+    private void initWebView(String url) {
         WebView webView = rootView.findViewById(R.id.webView);
         webView.getSettings().setLoadsImagesAutomatically(true);
         webView.getSettings().setJavaScriptEnabled(true);

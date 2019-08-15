@@ -6,19 +6,20 @@
 
     <ProgressBar
         android:id="@+id/trending_progress_bar"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+
         android:layout_gravity="center"/>
 
     <Button
-        android:id="@+id/bt_saved_news_main"
+        android:id="@+id/bt_retry_load_news"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="70dp"
+        android:layout_marginTop="60dp"
         android:background="#52CE74"
         android:padding="8dp"
-        android:text="Goto Saved News"
+        android:text="Retry"
         android:textAllCaps="false"
         android:textColor="#ffffff"
         android:visibility="invisible" />

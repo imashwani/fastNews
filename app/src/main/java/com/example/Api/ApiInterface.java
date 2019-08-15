@@ -25,7 +25,6 @@ public interface ApiInterface {
     //Endpoint to fetch search results.
     @GET("everything")
     Call<NewsResponse> getSearchResults(@Query("q") String query,
-                                        @Query("sortBy") String sortBy,
                                         @Query("language") String language,
                                         @Query("apiKey") String apiKey);
 

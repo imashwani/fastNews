@@ -10,6 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -38,6 +39,7 @@ public class NewsFragment extends Fragment implements NewsAdapter.OnItemListener
     RecyclerView.LayoutManager layoutManager;
     NewsAdapter newsAdapter;
     ProgressBar progressBar;
+    Button retryBt;
     String category = null;
 
     public NewsFragment() {
@@ -57,9 +59,19 @@ public class NewsFragment extends Fragment implements NewsAdapter.OnItemListener
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        rootView = inflater.inflate(R.layout.fragment_trending, container, false);
+        rootView = inflater.inflate(R.layout.fragment_news, container, false);
         progressBar = rootView.findViewById(R.id.trending_progress_bar);
         recyclerView = rootView.findViewById(R.id.news_recycler_view);
+        retryBt = rootView.findViewById(R.id.bt_retry_load_news);
+        retryBt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                progressBar.setVisibility(View.VISIBLE);
+                retryBt.setVisibility(View.INVISIBLE);
+                if (category != null) loadCategoryJSON();
+                else loadJSON();
+            }
+        });
 
         layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
@@ -86,6 +98,8 @@ public class NewsFragment extends Fragment implements NewsAdapter.OnItemListener
         recyclerView.setAdapter(newsAdapter);
         newsAdapter.notifyDataSetChanged();
         newsAdapter.setOnItemClickListener(this);
+
+        progressBar.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -97,10 +111,8 @@ public class NewsFragment extends Fragment implements NewsAdapter.OnItemListener
 
     private void loadJSON() {
         ApiInterface request = ApiClient.getClient().create(ApiInterface.class);
-
         Call<NewsResponse> call = request.getTopCountryHeadlines("in", Constants.API_KEY);
         call.enqueue(new Callback<NewsResponse>() {
-
             @Override
             public void onResponse(@NonNull Call<NewsResponse> call, @NonNull Response<NewsResponse> response) {
 
@@ -115,6 +127,7 @@ public class NewsFragment extends Fragment implements NewsAdapter.OnItemListener
 
             @Override
             public void onFailure(@NonNull Call<NewsResponse> call, @NonNull Throwable t) {
+                retryBt.setVisibility(View.VISIBLE);
                 Toast.makeText(getContext(), "ERROR IN GETTING RESPONSE", Toast.LENGTH_SHORT).show();
             }
         });
@@ -139,6 +152,7 @@ public class NewsFragment extends Fragment implements NewsAdapter.OnItemListener
 
                 @Override
                 public void onFailure(@NonNull Call<NewsResponse> call, @NonNull Throwable t) {
+                    retryBt.setVisibility(View.VISIBLE);
                     Toast.makeText(getContext(), "ERROR IN GETTING RESPONSE, please retry !", Toast.LENGTH_SHORT).show();
                 }
             });
@@ -159,9 +173,15 @@ public class NewsFragment extends Fragment implements NewsAdapter.OnItemListener
     @Override
     public void saveNewsOffline(Article article) {
         if (fragmentActionListener != null) {
-            Toast.makeText(getActivity(), "saving news offline" + article.getTitle(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "saving news offline"
+                    + article.getTitle(), Toast.LENGTH_SHORT).show();
             fragmentActionListener.saveNewsOffline(article);
         }
+    }
+
+    @Override
+    public void deleteNews(Article article) {
+
     }
 
     public void setFragmentActionListener(FragmentActionListener fal) {
