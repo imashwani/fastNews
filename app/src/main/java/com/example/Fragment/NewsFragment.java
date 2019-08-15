@@ -175,8 +175,7 @@ public class NewsFragment extends Fragment implements NewsAdapter.OnItemListener
     @Override
     public void saveNewsOffline(Article article) {
         if (fragmentActionListener != null) {
-            Toast.makeText(getActivity(), "saving news offline"
-                    + article.getTitle(), Toast.LENGTH_SHORT).show();
+//            Toast.makeText(getActivity(), "saving news offline"+ article.getTitle(), Toast.LENGTH_SHORT).show();
             fragmentActionListener.saveNewsOffline(article);
         }
     }

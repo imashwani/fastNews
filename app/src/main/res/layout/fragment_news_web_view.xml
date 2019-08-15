@@ -45,19 +45,32 @@
                         app:layout_constraintTop_toTopOf="parent"
                         tools:ignore="UnusedAttribute" />
 
+
                     <TextView
+                        android:background="@drawable/white_shadow_bottom"
                         android:id="@+id/tv_title_webview"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_margin="12dp"
-                        android:layout_marginStart="12dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginEnd="12dp"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
                         android:fontFamily="sans-serif-light"
                         android:text="Title of News"
                         android:textColor="@color/titleTextColor"
                         android:textSize="19sp"
                         android:textStyle="bold"
+                        app:layout_constraintBottom_toBottomOf="@+id/backdrop"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.0"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                    <TextView
+                        android:id="@+id/web_view_description"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:text="Description"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/backdrop" />
@@ -69,17 +82,34 @@
                         android:layout_below="@id/tv_title_webview"
                         android:layout_margin="12dp"
                         android:layout_marginStart="12dp"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginTop="4dp"
                         android:layout_marginEnd="8dp"
+                        android:layout_marginBottom="4dp"
                         android:drawablePadding="10dp"
                         android:ellipsize="end"
                         android:maxLines="1"
                         android:singleLine="true"
                         android:text="Publish time"
+                        app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_bias="0.0"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/tv_title_webview" />
+                        app:layout_constraintTop_toBottomOf="@+id/web_view_description" />
+
+                    <ImageButton
+                        android:id="@+id/share_imgbtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginBottom="4dp"
+                        android:src="@drawable/ic_share_black_24dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="1.0"
+                        app:layout_constraintStart_toEndOf="@+id/tv_time_webview"
+                        app:layout_constraintTop_toBottomOf="@+id/web_view_description" />
 
                     <!--<LinearLayout-->
                     <!--android:layout_width="match_parent"-->

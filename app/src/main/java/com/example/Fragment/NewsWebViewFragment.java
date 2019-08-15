@@ -1,6 +1,7 @@
 package com.example.Fragment;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -8,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -28,7 +30,8 @@ public class NewsWebViewFragment extends Fragment {
     private Article article = null;
 
     private ImageView newsImageIV;
-    private TextView date, timeTV, titleTV;
+    private TextView timeTV, titleTV, descriptionTv;
+    private ImageButton shareBt;
 
 
     public NewsWebViewFragment() {
@@ -54,7 +57,20 @@ public class NewsWebViewFragment extends Fragment {
         newsImageIV = rootView.findViewById(R.id.backdrop);
         timeTV = rootView.findViewById(R.id.tv_time_webview);
         titleTV = rootView.findViewById(R.id.tv_title_webview);
+        descriptionTv = rootView.findViewById(R.id.web_view_description);
+        shareBt = rootView.findViewById(R.id.share_imgbtn);
 
+        shareBt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String shareBody = article.getTitle() + "\n\n" + article.getDescription() + "\n\n" + article.getUrl();
+                Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+                sharingIntent.setType("text/plain");
+                sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Sharing News from fastNEWS app");
+                sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+                startActivity(Intent.createChooser(sharingIntent, "FastNEWS, share the News"));
+            }
+        });
 
         RequestOptions requestOptions = new RequestOptions();
         requestOptions.error(Util.getRandomDrawbleColor());
@@ -66,6 +82,7 @@ public class NewsWebViewFragment extends Fragment {
                 .into(newsImageIV);
         timeTV.setText(Util.getFormattedDate(article.getPublishedAt()));
         titleTV.setText(article.getTitle());
+        descriptionTv.setText(article.getDescription());
     }
 
     private void initWebView(String url) {

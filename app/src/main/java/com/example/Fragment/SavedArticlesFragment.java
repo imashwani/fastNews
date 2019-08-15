@@ -39,6 +39,7 @@ public class SavedArticlesFragment extends Fragment implements NewsAdapter.OnIte
     private NewsAdapter newsAdapter;
     private ArrayList<Article> articles;
     private FragmentActionListener fragmentActionListener = null;
+    private View emptyView;
 
     public SavedArticlesFragment() {
         // Required empty public constructor
@@ -49,6 +50,8 @@ public class SavedArticlesFragment extends Fragment implements NewsAdapter.OnIte
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         rootView = inflater.inflate(R.layout.fragment_saved_articles, container, false);
+
+        emptyView = rootView.findViewById(R.id.include_empty_view);
 
         articlesDatabase = ArticlesDatabase.getInstance(getActivity().getApplicationContext());
 
@@ -71,6 +74,11 @@ public class SavedArticlesFragment extends Fragment implements NewsAdapter.OnIte
     }
 
     private void setData(ArrayList<Article> articles) {
+        if (articles.size() == 0)
+            emptyView.setVisibility(View.VISIBLE);
+        else
+            emptyView.setVisibility(View.INVISIBLE);
+
         newsAdapter = new NewsAdapter(articles, getContext());
         recyclerView.setAdapter(newsAdapter);
         newsAdapter.notifyDataSetChanged();

@@ -12,6 +12,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
@@ -90,10 +91,13 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.MyViewHolder> 
         holder.saveImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (article.isSaved())
+                if (article.isSaved()) {
+                    Toast.makeText(context, "Deleted!", Toast.LENGTH_SHORT).show();
                     onItemListener.deleteNews(article);
-                else
+                } else {
+                    Toast.makeText(context, "Saved!", Toast.LENGTH_SHORT).show();
                     onItemListener.saveNewsOffline(article);
+                }
             }
         });
 

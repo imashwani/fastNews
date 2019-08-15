@@ -9,4 +9,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:listitem="@layout/single_news_item" />
+
+    <include
+        android:id="@+id/include_empty_view"
+        layout="@layout/empty_view"
+        android:visibility="invisible" />
 </FrameLayout>
