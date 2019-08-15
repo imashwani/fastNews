@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.Adapter.NewsAdapter;
@@ -33,15 +34,16 @@ import retrofit2.Response;
 public class NewsFragment extends Fragment implements NewsAdapter.OnItemListener {
     public static final String ARG_CATEGORY = "category";
 
-    FragmentActionListener fragmentActionListener;
-    View rootView;
-    ArrayList<Article> articleStructure = new ArrayList<>();
-    RecyclerView recyclerView;
-    RecyclerView.LayoutManager layoutManager;
-    NewsAdapter newsAdapter;
-    ProgressBar progressBar;
-    Button retryBt;
-    String category = null;
+    private FragmentActionListener fragmentActionListener;
+    private View rootView;
+    private ArrayList<Article> articleStructure = new ArrayList<>();
+    private RecyclerView recyclerView;
+    private RecyclerView.LayoutManager layoutManager;
+    private NewsAdapter newsAdapter;
+    private ProgressBar progressBar;
+    private Button retryBt;
+    private String category = null;
+    private TextView errorTv;
 
     public NewsFragment() {
         // Required empty public constructor
@@ -64,6 +66,9 @@ public class NewsFragment extends Fragment implements NewsAdapter.OnItemListener
         progressBar = rootView.findViewById(R.id.trending_progress_bar);
         recyclerView = rootView.findViewById(R.id.news_recycler_view);
         retryBt = rootView.findViewById(R.id.bt_retry_load_news);
+        errorTv = rootView.findViewById(R.id.error_tv_news_frag);
+        errorTv.setText("");
+
         retryBt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -129,8 +134,7 @@ public class NewsFragment extends Fragment implements NewsAdapter.OnItemListener
 
             @Override
             public void onFailure(@NonNull Call<NewsResponse> call, @NonNull Throwable t) {
-                retryBt.setVisibility(View.VISIBLE);
-                Toast.makeText(getContext(), "ERROR IN GETTING RESPONSE", Toast.LENGTH_SHORT).show();
+                handleError();
             }
         });
     }
@@ -154,13 +158,22 @@ public class NewsFragment extends Fragment implements NewsAdapter.OnItemListener
 
                 @Override
                 public void onFailure(@NonNull Call<NewsResponse> call, @NonNull Throwable t) {
-                    retryBt.setVisibility(View.VISIBLE);
-                    Toast.makeText(getContext(), "ERROR IN GETTING RESPONSE, please retry !", Toast.LENGTH_SHORT).show();
+                    handleError();
                 }
             });
         } else {
             Toast.makeText(getContext(), "ERROR IN Category args", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    void handleError() {
+        retryBt.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.INVISIBLE);
+        errorTv.setText("Error in getting Response, Please Retry!");
+        if (Util.isNetworkAvailable(getActivity()) == false) {
+            errorTv.setText("No Internet Available, still You can view your saved Articles!");
+        }
+//        Toast.makeText(getContext(), "ERROR IN GETTING RESPONSE, please retry !", Toast.LENGTH_SHORT).show();
     }
 
     @Override

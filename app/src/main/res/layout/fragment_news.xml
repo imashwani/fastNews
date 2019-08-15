@@ -4,12 +4,20 @@
     android:layout_height="match_parent"
     tools:context="com.example.Fragment.NewsFragment">
 
+    <TextView
+        android:id="@+id/error_tv_news_frag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="55dp"
+        android:text="Here is some error"
+        android:textAlignment="center" />
+
     <ProgressBar
         android:id="@+id/trending_progress_bar"
         android:layout_width="60dp"
         android:layout_height="60dp"
-
-        android:layout_gravity="center"/>
+        android:layout_gravity="center" />
 
     <Button
         android:id="@+id/bt_retry_load_news"

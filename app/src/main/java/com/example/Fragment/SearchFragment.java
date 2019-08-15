@@ -23,6 +23,7 @@ import com.example.Models.Constants;
 import com.example.Models.NewsResponse;
 import com.example.fastnews.FragmentActionListener;
 import com.example.fastnews.R;
+import com.example.fastnews.Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -117,7 +118,13 @@ public class SearchFragment extends Fragment implements NewsAdapter.OnItemListen
 
             @Override
             public void onFailure(@NonNull Call<NewsResponse> call, @NonNull Throwable t) {
+                progressBar.setVisibility(View.INVISIBLE);
                 resultTextView.setText("Error In Getting response");
+                if (Util.isNetworkAvailable(getActivity()) == false) {
+
+                    resultTextView.setText("Seems like internet is not available, still you can view your saved articles!!");
+                }
+
             }
         });
     }

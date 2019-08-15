@@ -57,7 +57,6 @@ public class Util {
     }
 
     public static String getPrefCountry(Context context) {
-
         SharedPreferences sharedPreferences = context.getApplicationContext().getSharedPreferences("fastnews", MODE_PRIVATE);
         return sharedPreferences.getString(COUNTRY, "in");
     }
