@@ -25,6 +25,7 @@ import com.example.Models.Constants;
 import com.example.Models.NewsResponse;
 import com.example.fastnews.PendingNotificationActivity;
 import com.example.fastnews.R;
+import com.example.fastnews.Util;
 
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
@@ -47,7 +48,7 @@ public class RepeatTopNewsNotifWork extends Worker {
         Log.d(TAG, "doWork: Started the request");
         final boolean[] flag = {false};
         ApiInterface request = ApiClient.getClient().create(ApiInterface.class);
-        Call<NewsResponse> call = request.getTopCountryHeadlines("in", Constants.API_KEY);
+        Call<NewsResponse> call = request.getTopCountryHeadlines(Util.getPrefCountry(getApplicationContext()), Constants.API_KEY);
         call.enqueue(new Callback<NewsResponse>() {
             @Override
             public void onResponse(@NonNull Call<NewsResponse> call, @NonNull Response<NewsResponse> response) {

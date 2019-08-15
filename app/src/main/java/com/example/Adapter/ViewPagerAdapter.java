@@ -1,4 +1,4 @@
-package com.example.Fragment;
+package com.example.Adapter;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;

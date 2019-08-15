@@ -1,4 +1,4 @@
-package com.example.fastnews;
+package com.example.Adapter;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -22,6 +22,8 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.example.Models.Article;
+import com.example.fastnews.R;
+import com.example.fastnews.Util;
 
 import java.util.ArrayList;
 import java.util.List;

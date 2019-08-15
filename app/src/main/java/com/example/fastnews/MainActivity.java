@@ -1,10 +1,19 @@
 package com.example.fastnews;
 
+import android.Manifest;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteConstraintException;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -28,6 +37,7 @@ import com.example.RoomDb.AppExecutors;
 import com.example.RoomDb.ArticlesDatabase;
 import com.example.Worker.RepeatTopNewsNotifWork;
 
+import java.io.IOException;
 import java.util.Calendar;
 
 
@@ -41,8 +51,12 @@ public class MainActivity extends AppCompatActivity implements FragmentActionLis
     private NewsWebViewFragment newsWebViewFragment;
     private SavedArticlesFragment savedArticlesFragment;
     private SearchFragment searchFragment = null;
-
+    private Location location;
+    private double describeContents;
+    private Geocoder geocoder;
+    private String countryCode = "";
     private ArticlesDatabase articlesDatabase;
+    private SharedPreferences sharedPreferences;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -112,6 +126,19 @@ public class MainActivity extends AppCompatActivity implements FragmentActionLis
 
         articlesDatabase = ArticlesDatabase.getInstance(getApplicationContext());
         setupNotification();
+
+        sharedPreferences = getApplicationContext().getSharedPreferences("fastnews", MODE_PRIVATE);
+        countryCode = sharedPreferences.getString(Util.COUNTRY, null);
+
+        if (countryCode == null || countryCode.length() == 0) {
+            LocationManager locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 101);
+            }
+            location = locationManager
+                    .getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            geocoder = new Geocoder(this);
+        }
     }
 
 
@@ -148,7 +175,6 @@ public class MainActivity extends AppCompatActivity implements FragmentActionLis
         fragmentTransaction.add(R.id.mainFragmentContainer, newsWebViewFragment);
         fragmentTransaction.addToBackStack(this.getClass().getName());
         fragmentTransaction.commit();
-
     }
 
     @Override
@@ -215,4 +241,52 @@ public class MainActivity extends AppCompatActivity implements FragmentActionLis
 
         Log.d("MainActivity", "setupNotification: Setting up Notification");
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case 101:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        return;
+                    }
+                    try {
+                        countryCode = geocoder.getFromLocation(location.getLatitude(),
+                                location.getLongitude(), 10).get(0).getCountryCode();
+                        updateCountryPref();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    //not granted
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        try {
+            countryCode = geocoder.getFromLocation(location.getLatitude(),
+                    location.getLongitude(), 10).get(0).getCountryCode();
+            updateCountryPref();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    void updateCountryPref() {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(Util.COUNTRY, countryCode.toLowerCase());
+        editor.commit();
+    }
+
 }

@@ -14,11 +14,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.Adapter.NewsAdapter;
 import com.example.Models.Article;
 import com.example.RoomDb.AppExecutors;
 import com.example.RoomDb.ArticlesDatabase;
 import com.example.fastnews.FragmentActionListener;
-import com.example.fastnews.NewsAdapter;
 import com.example.fastnews.R;
 
 import java.util.ArrayList;
@@ -29,7 +29,6 @@ import java.util.List;
  * A simple {@link Fragment} subclass.
  */
 public class SavedArticlesFragment extends Fragment implements NewsAdapter.OnItemListener {
-
 
     private View rootView;
     private LifecycleOwner context;

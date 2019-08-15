@@ -1,6 +1,7 @@
 package com.example.fastnews;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
@@ -10,7 +11,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class Util {
+    public static String COUNTRY = "country";
     public static String getFormattedDate(String rawDate) {
         String outputDateString = "";
         String pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'";
@@ -50,5 +54,11 @@ public class Util {
 
         return connectivityManager.getActiveNetworkInfo() != null
                 && connectivityManager.getActiveNetworkInfo().isConnectedOrConnecting();
+    }
+
+    public static String getPrefCountry(Context context) {
+
+        SharedPreferences sharedPreferences = context.getApplicationContext().getSharedPreferences("fastnews", MODE_PRIVATE);
+        return sharedPreferences.getString(COUNTRY, "in");
     }
 }

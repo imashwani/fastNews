@@ -14,14 +14,15 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.example.Adapter.NewsAdapter;
 import com.example.Api.ApiClient;
 import com.example.Api.ApiInterface;
 import com.example.Models.Article;
 import com.example.Models.Constants;
 import com.example.Models.NewsResponse;
 import com.example.fastnews.FragmentActionListener;
-import com.example.fastnews.NewsAdapter;
 import com.example.fastnews.R;
+import com.example.fastnews.Util;
 
 import java.util.ArrayList;
 
@@ -109,9 +110,10 @@ public class NewsFragment extends Fragment implements NewsAdapter.OnItemListener
         outState.putSerializable("data", articleStructure);
     }
 
+
     private void loadJSON() {
         ApiInterface request = ApiClient.getClient().create(ApiInterface.class);
-        Call<NewsResponse> call = request.getTopCountryHeadlines("in", Constants.API_KEY);
+        Call<NewsResponse> call = request.getTopCountryHeadlines(Util.getPrefCountry(getActivity()), Constants.API_KEY);
         call.enqueue(new Callback<NewsResponse>() {
             @Override
             public void onResponse(@NonNull Call<NewsResponse> call, @NonNull Response<NewsResponse> response) {

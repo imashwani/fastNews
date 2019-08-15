@@ -15,13 +15,13 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.Adapter.NewsAdapter;
 import com.example.Api.ApiClient;
 import com.example.Api.ApiInterface;
 import com.example.Models.Article;
 import com.example.Models.Constants;
 import com.example.Models.NewsResponse;
 import com.example.fastnews.FragmentActionListener;
-import com.example.fastnews.NewsAdapter;
 import com.example.fastnews.R;
 
 import java.util.ArrayList;
