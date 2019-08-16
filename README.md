@@ -7,7 +7,7 @@ WorkManager from android arch for Recuurent Notification
 
 ![screen1](https://user-images.githubusercontent.com/20511163/63115565-0d9eaf80-bfb5-11e9-909e-80eae8475311.png)
 
-**Set2:** SavedFragment when empty, and when having some items, recurring Notification of top news 
+**Set2:** SavedFragment when no saved articles, and when having some saved articles, recurring Notification of top news 
       received  from app implemented using workManager
       
 ![screen2](https://user-images.githubusercontent.com/20511163/63115569-10010980-bfb5-11e9-9486-29d69a1f168a.png)
