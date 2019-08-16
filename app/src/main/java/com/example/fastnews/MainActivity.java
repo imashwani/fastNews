@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements FragmentActionLis
     private SavedArticlesFragment savedArticlesFragment;
     private SearchFragment searchFragment = null;
     private Location location;
-    private double describeContents;
+    private LocationManager locationManager;
     private Geocoder geocoder;
     private String countryCode = "";
     private ArticlesDatabase articlesDatabase;
@@ -131,13 +131,14 @@ public class MainActivity extends AppCompatActivity implements FragmentActionLis
         countryCode = sharedPreferences.getString(Util.COUNTRY, null);
 
         if (countryCode == null || countryCode.length() == 0) {
-            LocationManager locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
+            locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 101);
+            } else {
+                location = locationManager
+                        .getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                geocoder = new Geocoder(this);
             }
-            location = locationManager
-                    .getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-            geocoder = new Geocoder(this);
         }
     }
 
@@ -251,6 +252,10 @@ public class MainActivity extends AppCompatActivity implements FragmentActionLis
                     if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                         return;
                     }
+
+                    location = locationManager
+                            .getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                    geocoder = new Geocoder(this);
                     try {
                         countryCode = geocoder.getFromLocation(location.getLatitude(),
                                 location.getLongitude(), 10).get(0).getCountryCode();
@@ -267,21 +272,6 @@ public class MainActivity extends AppCompatActivity implements FragmentActionLis
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        try {
-            countryCode = geocoder.getFromLocation(location.getLatitude(),
-                    location.getLongitude(), 10).get(0).getCountryCode();
-            updateCountryPref();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     void updateCountryPref() {
         SharedPreferences.Editor editor = sharedPreferences.edit();
