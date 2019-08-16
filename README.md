@@ -3,6 +3,8 @@
 Implemented using newsapi.org, retorofit for api calls and RoomDb for offline storage, Frgaments for most of the views,
 WorkManager from android arch for Recuurent Notification
 
+Download the apk here https://drive.google.com/open?id=1183RXKBK90ghdI5WYE3Kw6p5046-I3oz
+
 **Set1:** TrendingNewsFragment, LocalNewsFragment with View pager and searchFragment
 
 ![screen1](https://user-images.githubusercontent.com/20511163/63115565-0d9eaf80-bfb5-11e9-909e-80eae8475311.png)
