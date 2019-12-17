@@ -3,7 +3,7 @@
 Implemented using newsapi.org, retorofit for api calls and RoomDb for offline storage, Frgaments for most of the views,
 WorkManager from android arch for Recuurent Notification
 
-Download the apk here https://drive.google.com/open?id=1183RXKBK90ghdI5WYE3Kw6p5046-I3oz
+Download the apk in release section https://github.com/imashwani/fastNews/releases/tag/v1.0
 
 **Set1:** TrendingNewsFragment, LocalNewsFragment with View pager and searchFragment
 
